@@ -34,16 +34,18 @@ function computerPlay() {
 }
 
 // get player's choice
-let playerChoice = prompt("Choose your weapon");
-while (!playerChoice || (!choices.includes(playerChoice.toLowerCase()))) {
-    alert("Not a valid choice!");
-    playerChoice = prompt("Choose your weapon");
+function playerPlay() {
+    let playerChoice = prompt("Choose your weapon");
+    if (playerChoice === null) {
+        return;
+    }
+    while (!choices.includes(playerChoice.toLowerCase())) {
+        alert("Not a valid choice!");
+        playerChoice = prompt("Choose your weapon");
+    }
+    return playerChoice.toLowerCase();
 }
-playerChoice = playerChoice.toLowerCase();
 
-// get computer's choice
-let computerChoice = computerPlay();
-console.log(computerChoice);
 
 // function to play a round
 function playRound(playerChoice, computerChoice) {
@@ -85,17 +87,59 @@ function playRound(playerChoice, computerChoice) {
                     outcome = outcomes["tie"];
             }
     }
+    if (outcome === outcomes["computerWins"]) {
+        console.log(`You lose! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1,)} beats ${playerChoice}.`);
+    } else if (outcome === outcomes["playerWins"]) {
+        console.log(`You win! ${playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1,)} beats ${computerChoice}.`);
+    } else {
+        console.log(`It's a tie. Both chose ${playerChoice}`);
+    }
+
     return outcome;
 }
 
-let outcome = playRound(playerChoice, computerChoice);
-console.log(outcome);
+// play five rounds
+let playerWins = 0,
+    computerWins = 0,
+    draws = 0;
 
-
-if (outcome === outcomes["computerWins"]) {
-    console.log(`You lose! ${computerChoice} beats ${playerChoice}.`);
-} else if (outcome === outcomes["playerWins"]) {
-    console.log(`You win! ${playerChoice} beats ${computerChoice}.`);
-} else {
-    console.log(`It's a tie. Both chose ${playerChoice}`);
+function game() {
+    let playerChoice, computerChoice, outcome;
+    for (let i = 1; i <= 5; i++) {
+        console.log(`Round ${i}:`)
+        playerChoice = playerPlay();
+        console.log(`Player chose ${playerChoice}`);
+        computerChoice = computerPlay();
+        console.log(`Computer chose ${computerChoice}`);
+        if (!playerChoice) {
+            console.log("\nAborted by player");
+            alert("You give up");
+            return;
+        }
+        outcome = playRound(playerChoice, computerChoice);
+        switch (outcome) {
+            case outcomes["computerWins"]:
+                computerWins += 1;
+                break;
+            case outcomes["playerWins"]:
+                playerWins += 1;
+                break;
+            default:
+                draws += 1;
+        }
+        console.log(`Player wins: ${playerWins}\nComputer wins: ${computerWins}\nDraws: ${draws}\n\n`)
+    }
+    if (playerWins > computerWins) {
+        console.log(`Player wins the best of 5: (${playerWins}/5 rounds won.)`);
+        alert(`Player wins the best of 5: (${playerWins}/5 rounds won.)`);
+    } else if (playerWins < computerWins) {
+        console.log(`Computer wins the best of 5: (${computerWins}/5 rounds won.)`);
+        alert(`Computer wins the best of 5: (${computerWins}/5 rounds won.)`);
+    } else {
+        console.log(`It's a draw. You won ${playerWins} round(s) each.`);
+        alert(`It's a draw. You won ${playerWins} round(s) each.`);
+    }
 }
+
+const playButton = document.querySelector("#play");
+playButton.addEventListener("click", game);
