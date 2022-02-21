@@ -99,11 +99,11 @@ function playRound(playerChoice, computerChoice) {
 }
 
 // play five rounds
-let playerWins = 0,
-    computerWins = 0,
-    draws = 0;
 
 function game() {
+    let playerWins = 0,
+        computerWins = 0,
+        draws = 0;
     let playerChoice, computerChoice, outcome;
     for (let i = 1; i <= 5; i++) {
         console.log(`Round ${i}:`)
@@ -131,7 +131,7 @@ function game() {
     }
     if (playerWins > computerWins) {
         console.log(`Player wins the best of 5: (${playerWins}/5 rounds won.)`);
-        alert(`Player wins the best of 5: (${playerWins}/5 rounds won.)`);
+        alert(`You win the best of 5: (${playerWins}/5 rounds won.)`);
     } else if (playerWins < computerWins) {
         console.log(`Computer wins the best of 5: (${computerWins}/5 rounds won.)`);
         alert(`Computer wins the best of 5: (${computerWins}/5 rounds won.)`);
@@ -139,6 +139,7 @@ function game() {
         console.log(`It's a draw. You won ${playerWins} round(s) each.`);
         alert(`It's a draw. You won ${playerWins} round(s) each.`);
     }
+    console.log("");
 }
 
 const playButton = document.querySelector("#play");
