@@ -36,14 +36,15 @@ function computerPlay() {
 // get player's choice
 function playerPlay() {
     let playerChoice = prompt("Choose your weapon");
-    if (playerChoice === null) {
-        return;
-    }
-    while (!choices.includes(playerChoice.toLowerCase())) {
+    while (playerChoice != null && !choices.includes(playerChoice.toLowerCase())) {
         alert("Not a valid choice!");
         playerChoice = prompt("Choose your weapon");
     }
-    return playerChoice.toLowerCase();
+    if (playerChoice === null) {
+        return playerChoice;
+    } else {
+        return playerChoice.toLowerCase();
+    }
 }
 
 
@@ -99,7 +100,6 @@ function playRound(playerChoice, computerChoice) {
 }
 
 // play five rounds
-
 function game() {
     let playerWins = 0,
         computerWins = 0,
@@ -143,4 +143,5 @@ function game() {
 }
 
 const playButton = document.querySelector("#play");
+playButton.focus();
 playButton.addEventListener("click", game);
