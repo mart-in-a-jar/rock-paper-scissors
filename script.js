@@ -1,7 +1,7 @@
 // List of options
 const choices = ["rock", "paper", "scissors"];
 // Outcomes
-const outcomes = {"tie": "Tie", "playerWins": "Player wins", "computerWins": "Computer wins!"};
+const outcomes = { "tie": "Tie", "playerWins": "Player wins", "computerWins": "Computer wins!" };
 
 // Function to generate random number between num1 and num2
 function random(num1, num2) {
@@ -13,24 +13,13 @@ function computerPlay() {
     return choices[random(0, choices.length - 1)]
 }
 
-// get and validate player's choice
-function playerPlay() {
-    let playerChoice;
-    while (true) {
-        playerChoice = prompt("Choose your weapon");
-        if (playerChoice === null) {
-            return playerChoice;
-        } else if (choices.includes(playerChoice.toLowerCase())) {
-            return playerChoice.toLowerCase();
-        } else {
-        alert("Not a valid choice!");
-        }
-    }
-} 
-
 // function to play a round
 function playRound(playerChoice, computerChoice) {
     let outcome;
+    compChoiceInfo.textContent = `Computer chose ${computerChoice}`;
+    compButton = document.querySelector(`#${computerChoice}`);
+    playerButton = document.querySelector(`#${playerChoice}`);
+    colorButtons(compButton, playerButton);
     switch (computerChoice) {
         case "rock":
             switch (playerChoice) {
@@ -69,34 +58,23 @@ function playRound(playerChoice, computerChoice) {
             }
     }
     if (outcome === outcomes["computerWins"]) {
-        console.log(`You lose! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1,)} beats ${playerChoice}.`);
+        outcomeInfo.textContent = `You lose! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1,)} beats ${playerChoice}.`;
+        scaleButton(compButton);
     } else if (outcome === outcomes["playerWins"]) {
-        console.log(`You win! ${playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1,)} beats ${computerChoice}.`);
+        outcomeInfo.textContent = `You win! ${playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1,)} beats ${computerChoice}.`;
+        scaleButton(playerButton);
     } else {
-        console.log(`It's a tie. Both chose ${playerChoice}`);
+        outcomeInfo.textContent = `It's a tie. Both chose ${playerChoice}`;
     }
-
     return outcome;
 }
 
-// play five rounds
+// Play if no one have won 5 times
 function game() {
-    let playerWins = 0,
-        computerWins = 0,
-        draws = 0;
-    let playerChoice, computerChoice, outcome;
-    for (let i = 1; i <= 5; i++) {
-        console.log(`Round ${i}:`)
-        playerChoice = playerPlay();
-        console.log(`Player chose ${playerChoice}`);
-        computerChoice = computerPlay();
-        console.log(`Computer chose ${computerChoice}`);
-        if (!playerChoice) {
-            console.log("\nAborted by player");
-            alert("You give up");
-            return;
-        }
-        outcome = playRound(playerChoice, computerChoice);
+    let outcome;
+    if (playerWins < 5 && computerWins < 5) {
+        outcome = playRound(this.id, computerPlay());
+        roundNumberInfo.textContent = `Round ${round}:`;
         switch (outcome) {
             case outcomes["computerWins"]:
                 computerWins += 1;
@@ -107,21 +85,105 @@ function game() {
             default:
                 draws += 1;
         }
-        console.log(`Player wins: ${playerWins}\nComputer wins: ${computerWins}\nDraws: ${draws}\n\n`)
+        updateInfo();
+        round++;
     }
-    if (playerWins > computerWins) {
-        console.log(`Player wins the best of 5: (${playerWins}/5 rounds won.)`);
-        alert(`You win the best of 5: (${playerWins}/5 rounds won.)`);
-    } else if (playerWins < computerWins) {
-        console.log(`Computer wins the best of 5: (${computerWins}/5 rounds won.)`);
-        alert(`Computer wins the best of 5: (${computerWins}/5 rounds won.)`);
-    } else {
-        console.log(`It's a draw. You won ${playerWins} round(s) each.`);
-        alert(`It's a draw. You won ${playerWins} round(s) each.`);
+    // Add restart button and deactivate game buttons if someone won
+    if (playerWins >= 5 || computerWins >= 5) {
+        choiceButtons.forEach(button => {
+            button.removeEventListener("click", game);
+        });
+        container.appendChild(restartButton);
     }
-    console.log("");
+
+
 }
 
-const playButton = document.querySelector("#play");
-playButton.focus();
-playButton.addEventListener("click", game);
+function updateInfo() {
+    playerWinsInfo.textContent = playerWins;
+    computerWinsInfo.textContent = computerWins;
+    drawsInfo.textContent = draws;
+    if (playerWins >= 5 || computerWins >= 5) {
+        if (playerWins > computerWins) {
+            gameOutcomeInfo.textContent = `You win the best of 5: (${playerWins}/${round} rounds won.)`;
+        } else if (playerWins < computerWins) {
+            gameOutcomeInfo.textContent = `Computer wins the best of 5: (${computerWins}/${round} rounds won.)`;
+        }
+    }
+    // TODO: Scale winner on scoreboard
+}
+
+let playerWins, computerWins, draws, round;
+
+function resetScore() {
+    playerWins = 0;
+    computerWins = 0;
+    draws = 0;
+    round = 1;
+}
+
+function activateButtons() {
+    choiceButtons.forEach(button => {
+        button.addEventListener("click", game)
+    });
+}
+
+function startGame() {
+    resetScore();
+    activateButtons();
+    allInfo.forEach(info => {
+        info.textContent = "";
+    });
+    clearColors();
+    if (document.querySelector(".restart")) {
+        container.removeChild(restartButton);
+    }
+}
+
+//BUG: animation won't trigger if same choice wins two times in a row
+
+// Clear colors and animation class
+function clearColors() {
+    choiceButtons.forEach(button => {
+        button.classList.remove("computer", "player", "playerAndComputer");
+        button.classList.remove("winner");
+    });
+}
+
+// Add color on buttons for both player's choice
+function colorButtons(compButton, playerButton) {
+    // Start by clearing existing background colors
+    clearColors();
+    // Add current colors
+    if (compButton === playerButton) {
+        compButton.classList.add("playerAndComputer");
+    } else {
+        compButton.classList.add("computer");
+        playerButton.classList.add("player");
+    }
+}
+
+function scaleButton(button) {
+    // Scale the button that won
+    button.classList.add("winner");
+}
+
+const choiceButtons = document.querySelectorAll(".choices button");
+const outcomeInfo = document.querySelector(".roundInfo .outcome");
+const compChoiceInfo = document.querySelector(".roundInfo .compChoice")
+const roundNumberInfo = document.querySelector(".roundInfo .roundNumber");
+const playerWinsInfo = document.querySelector("#playerWins");
+const computerWinsInfo = document.querySelector("#compWins");
+const drawsInfo = document.querySelector("#draws");
+const gameOutcomeInfo = document.querySelector(".gameOutcome");
+const container = document.querySelector(".content");
+const restartButton = document.createElement("button");
+const allInfo = [outcomeInfo, compChoiceInfo, roundNumberInfo, playerWinsInfo, computerWinsInfo, drawsInfo, gameOutcomeInfo];
+
+restartButton.textContent = "Play again";
+restartButton.classList.add("restart");
+
+// Could maybe just make this one refresh the page
+restartButton.addEventListener("click", startGame);
+
+startGame();
