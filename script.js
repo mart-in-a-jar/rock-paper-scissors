@@ -59,10 +59,10 @@ function playRound(playerChoice, computerChoice) {
     }
     if (outcome === outcomes["computerWins"]) {
         outcomeInfo.textContent = `You lose! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1,)} beats ${playerChoice}.`;
-        scaleButton(compButton);
+        scaleItem(compButton);
     } else if (outcome === outcomes["playerWins"]) {
         outcomeInfo.textContent = `You win! ${playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1,)} beats ${computerChoice}.`;
-        scaleButton(playerButton);
+        scaleItem(playerButton);
     } else {
         outcomeInfo.textContent = `It's a tie. Both chose ${playerChoice}`;
     }
@@ -106,11 +106,14 @@ function updateInfo() {
     if (playerWins >= 5 || computerWins >= 5) {
         if (playerWins > computerWins) {
             gameOutcomeInfo.textContent = `You win the best of 5: (${playerWins}/${round} rounds won.)`;
+            scaleItem(playerScore);
+            playerScore.style["font-weight"] = "bold";
         } else if (playerWins < computerWins) {
             gameOutcomeInfo.textContent = `Computer wins the best of 5: (${computerWins}/${round} rounds won.)`;
+            scaleItem(compScore);
+            compScore.style["font-weight"] = "bold";
         }
     }
-    // TODO: Scale winner on scoreboard
 }
 
 let playerWins, computerWins, draws, round;
@@ -138,9 +141,9 @@ function startGame() {
     if (document.querySelector(".restart")) {
         container.removeChild(restartButton);
     }
+    playerScore.style["font-weight"] = "";
+    compScore.style["font-weight"] = "";
 }
-
-//BUG: animation won't trigger if same choice wins two times in a row
 
 // Clear colors and animation class
 function clearColors() {
@@ -163,9 +166,11 @@ function colorButtons(compButton, playerButton) {
     }
 }
 
-function scaleButton(button) {
-    // Scale the button that won
-    button.classList.add("winner");
+function scaleItem(item) {
+    item.classList.add("winner");
+    window.setTimeout(() => {
+        item.classList.remove("winner");
+    }, 800);
 }
 
 const choiceButtons = document.querySelectorAll(".choices button");
@@ -179,6 +184,9 @@ const gameOutcomeInfo = document.querySelector(".gameOutcome");
 const container = document.querySelector(".content");
 const restartButton = document.createElement("button");
 const allInfo = [outcomeInfo, compChoiceInfo, roundNumberInfo, playerWinsInfo, computerWinsInfo, drawsInfo, gameOutcomeInfo];
+const compScore = document.querySelector(".score > table > tbody > tr:nth-child(1)")
+const playerScore = document.querySelector(".score > table > tbody > tr:nth-child(2)")
+const drawScore = document.querySelector(".score > table > tbody > tr:nth-child(3)")
 
 restartButton.textContent = "Play again";
 restartButton.classList.add("restart");
