@@ -167,10 +167,10 @@ function colorButtons(compButton, playerButton) {
 }
 
 function scaleItem(item) {
-    item.classList.add("winner");
+    item.classList.remove("winner");
     window.setTimeout(() => {
-        item.classList.remove("winner");
-    }, 800);
+        item.classList.add("winner");
+    }, 20);
 }
 
 const choiceButtons = document.querySelectorAll(".choices button");
